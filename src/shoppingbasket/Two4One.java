@@ -18,25 +18,20 @@ public class Two4One implements Discountable{
         this.discountSignature= new ArrayList<>();
     }
     
+   
     @Override
       public  ArrayList<Integer> discount(Item item, int quantity){
-        //free item id, number to trigger free item, %discount
+        //free item id, % if discount is a %, items payable if 3 for 2 etc
         this.getDiscountSignature().add(0);
         this.getDiscountSignature().add(0);
         this.getDiscountSignature().add(quantity/2);
         return this.getDiscountSignature();
     }
 
-    /**
-     * @return the discountSignature
-     */
     public ArrayList<Integer> getDiscountSignature() {
         return discountSignature;
     }
 
-    /**
-     * @param discountSignature the discountSignature to set
-     */
     public void setDiscountSignature(ArrayList<Integer> discountSignature) {
         this.discountSignature = discountSignature;
     }

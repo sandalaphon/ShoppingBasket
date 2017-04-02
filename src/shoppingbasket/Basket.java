@@ -26,11 +26,7 @@ public class Basket {
         this.discountCode = new ArrayList<>();
         this.loyaltyCard = loyaltyCard;
     }   
-//
-//    public HashMap<Item, Integer> getItemsHash() {
-//        return orderedItemsHash;
-//    }
-    
+
     public void addItem(Item item){
         Integer val;
 
@@ -83,6 +79,8 @@ public class Basket {
        return costOfBasket;
    }
    
+   
+   //note getItemDiscounts returns a negative Integer
    public Integer getItemDiscounts(){
        Integer discountTotal=0;
        HashMap<Item, Integer> iteratingHash = new HashMap(orderedItemsHash);
@@ -94,8 +92,9 @@ public class Basket {
            Integer quantity = (Integer)pair.getValue();
            if(item.getDiscount()!=null){
            discountCode = item.getDiscount().discount(item, quantity);
-           Integer itemsPayable = discountCode.get(2);
-           discountTotal -= price*itemsPayable;
+           //extend via a case statement if multiple discount types
+           Integer itemsDeductable = discountCode.get(2);
+           discountTotal -= price*itemsDeductable;
            }
            it.remove();
        }
@@ -105,7 +104,7 @@ public class Basket {
    public Integer priceToPay(){
        Integer undeducted = undiscountedPriceToPay();
        Integer itemDeductions = getItemDiscounts();
-       Integer cost = undeducted + itemDeductions;
+       Integer cost = undeducted + itemDeductions; // itemsDeductions is negative
 //       check for bulk discount and apply
        if (cost>2000){
            cost = 9*cost/10;
