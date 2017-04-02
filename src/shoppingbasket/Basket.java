@@ -8,7 +8,7 @@ package shoppingbasket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+
 
 /**
  *
@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class Basket {
    private HashMap<Item, Integer >orderedItemsHash;
-   private Integer costOfBasket;
+   private Integer costOfBasket; 
    private ArrayList<Integer>discountCode;
    private boolean loyaltyCard;
 
@@ -26,10 +26,10 @@ public class Basket {
         this.discountCode = new ArrayList<>();
         this.loyaltyCard = loyaltyCard;
     }   
-
-    public HashMap<Item, Integer> getItemsHash() {
-        return orderedItemsHash;
-    }
+//
+//    public HashMap<Item, Integer> getItemsHash() {
+//        return orderedItemsHash;
+//    }
     
     public void addItem(Item item){
         Integer val;
@@ -105,7 +105,7 @@ public class Basket {
    public Integer priceToPay(){
        Integer undeducted = undiscountedPriceToPay();
        Integer itemDeductions = getItemDiscounts();
-       Integer cost = undeducted - itemDeductions;
+       Integer cost = undeducted + itemDeductions;
 //       check for bulk discount and apply
        if (cost>2000){
            cost = 9*cost/10;
