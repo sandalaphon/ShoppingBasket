@@ -7,6 +7,8 @@ package shoppingbasket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *
@@ -14,39 +16,106 @@ import java.util.HashMap;
  */
 
 public class Basket {
-   private HashMap<Item, Integer >itemsHash;
-    private ArrayList<Item> itemsArray;
+   private HashMap<Item, Integer >orderedItemsHash;
+   private Integer costOfBasket;
+   private ArrayList<Integer>discountCode;
+   private boolean loyaltyCard;
 
-    public Basket() {
-       
-        this.itemsArray = new ArrayList<>(); //items ordered
-        this.itemsHash = new HashMap<>(); //items and quantity ordered     
+    public Basket(Boolean loyaltyCard) {
+        this.orderedItemsHash = new HashMap<>(); //items and quantity ordered 
+        this.discountCode = new ArrayList<>();
+        this.loyaltyCard = loyaltyCard;
     }   
 
     public HashMap<Item, Integer> getItemsHash() {
-        return itemsHash;
+        return orderedItemsHash;
     }
-
-    public ArrayList<Item> getItemsArray() {
-        return itemsArray;
-    }
-    
     
     public void addItem(Item item){
-        boolean exists = false;
         Integer val;
-        for(Item arrayItem : this.itemsArray){
-            if (arrayItem==item){ exists = true; }                  
-        } 
-        if(exists){
-           val = itemsHash.get(item);
-           itemsHash.put(item, val+1);   
+
+        if(exists(item)){
+           val = orderedItemsHash.get(item);
+           orderedItemsHash.put(item, val+1);   
         } else {
-            itemsArray.add(item);
+            orderedItemsHash.put(item, 1);
         }
     }
     
+    public void removeItem(Item item){
+        if(exists(item)){
+            Integer val = orderedItemsHash.get(item);
+            orderedItemsHash.put(item, val-1);
+        } else {return;}
+        if (orderedItemsHash.get(item)==0){
+            orderedItemsHash.remove(item);  
+        }
+    }
     
+    public boolean exists(Item item){
+          return orderedItemsHash.containsKey(item);
+    }
+    
+    public Integer quantityOrdered(Item item){
+        if(exists(item)){
+            return orderedItemsHash.get(item);
+        } else {
+            return 0;
+        }
+    }
+    
+    public void emptyBasket(){
+        orderedItemsHash.clear();
+    }
+    
+   public Integer undiscountedPriceToPay(){
+       costOfBasket=0;
+       HashMap<Item, Integer> iteratingHash = new HashMap(orderedItemsHash);
+       Iterator it = iteratingHash.entrySet().iterator();
+       while (it.hasNext()){
+           HashMap.Entry pair = (HashMap.Entry)it.next();
+           Item item = (Item)pair.getKey();
+           Integer price = item.getPrice();
+           Integer quantity = (Integer)pair.getValue();
+           costOfBasket += price*quantity;
+           it.remove();
+       }
+       return costOfBasket;
+   }
+   
+   public Integer getItemDiscounts(){
+       Integer discountTotal=0;
+       HashMap<Item, Integer> iteratingHash = new HashMap(orderedItemsHash);
+       Iterator it = iteratingHash.entrySet().iterator();
+       while (it.hasNext()){
+           HashMap.Entry pair = (HashMap.Entry)it.next();
+           Item item = (Item)pair.getKey();
+           Integer price = item.getPrice();
+           Integer quantity = (Integer)pair.getValue();
+           if(item.getDiscount()!=null){
+           discountCode = item.getDiscount().discount(item, quantity);
+           Integer itemsPayable = discountCode.get(2);
+           discountTotal -= price*itemsPayable;
+           }
+           it.remove();
+       }
+       return discountTotal;
+   }
+   
+   public Integer priceToPay(){
+       Integer undeducted = undiscountedPriceToPay();
+       Integer itemDeductions = getItemDiscounts();
+       Integer cost = undeducted - itemDeductions;
+//       check for bulk discount and apply
+       if (cost>2000){
+           cost = 9*cost/10;
+       }
+       //apply loyaltyCard discount if applicable.
+       if (loyaltyCard){
+           cost = 98*cost/100;
+       }
+       return cost;
+   }
     
     
     
